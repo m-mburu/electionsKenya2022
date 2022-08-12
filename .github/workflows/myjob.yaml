@@ -19,10 +19,10 @@ jobs:
     # Set-up R
     - name: Install packages
       run: |
-        R -e 'install.packages("tidyverse")'
-        R -e 'install.packages("data.table")'
-        R -e 'install.packages("janitor")'
-        R -e 'install.packages("XML")'
+        R -e 'utils::install.packages("tidyverse")'
+        R -e 'utils::install.packages("data.table")'
+        R -e 'utils::install.packages("janitor")'
+        R -e 'utils::install.packages("XML")'
         
     # Run R script
     - name: download Data
