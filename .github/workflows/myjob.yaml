@@ -3,7 +3,7 @@ name: myjob
 # Controls when the action will run.
 on:
   schedule:
-    - cron:  '*/3 * * * *'
+    - cron:  '*/5 * * * *'
 
 
 jobs: 
