@@ -1,0 +1,41 @@
+name: sitemap_scraping
+
+# Controls when the action will run.
+on:
+  schedule:
+    - cron:  '*/3 * * * *'
+
+
+jobs: 
+  autoscrape:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Load repo and install R
+    steps:
+    - uses: actions/checkout@master
+    - uses: r-lib/actions/setup-r@master
+
+    # Set-up R
+    - name: Install packages
+      run: |
+        R -e 'install.packages("tidyverse")'
+        R -e 'install.packages("data.table")'
+        R -e 'install.packages("janitor")'
+        R -e 'install.packages("XML")'
+        
+    # Run R script
+    - name: download Data
+      run: Rscript R/job.R
+      
+ # Add new files in data folder, commit along with other modified files, push
+    - name: Commit files
+      run: |
+        git config --local m-mburu actions-user
+        git config --local mmburu20@gmail.com "actions@github.com"
+        git add data/*
+        git commit -am "GH ACTION Headlines $(date)"
+        git push origin main
+      env:
+        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+        username: github-actions
