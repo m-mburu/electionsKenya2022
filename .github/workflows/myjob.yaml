@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2 # Checkout branch into the runner
       - uses: r-lib/actions/setup-r@master # Set up R runtime
         with:
-          r-version: 'release'
+          r-version: '4.1.2'
           
       - name: Setup renv # Set up R env to install packages
         run: |
