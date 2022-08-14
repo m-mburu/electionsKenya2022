@@ -2,9 +2,10 @@ name: myjob
 
 # Controls when the action will run.
 on:
+  push:
+  workflow_dispatch:
   schedule:
     - cron:  '*/5 * * * *'
-
 
 jobs: 
   autoscrape:
