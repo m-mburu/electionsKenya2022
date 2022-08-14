@@ -1,4 +1,4 @@
-name: myjob
+name: sitemap_scraping
 
 # Controls when the action will run.
 on:
@@ -6,39 +6,35 @@ on:
     - cron:  '*/5 * * * *'
 
 
-jobs:
-  generate-data:
+jobs: 
+  autoscrape:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2 # Checkout branch into the runner
-      - uses: r-lib/actions/setup-r@master # Set up R runtime
-        with:
-          r-version: '4.1.2'
-          
-      - name: Setup renv # Set up R env to install packages
-        run: |
-          utils::install.packages('remotes')
-          remotes::install_github("rstudio/renv")
-        shell: Rscript {0}
-        
-      - uses: actions/cache@v2 # Cache packages so won't be compiled everytime job is run
-        with:
-          path: ~/.local/share/renv
-          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-renv-
 
-      - name: Install dependencies # Install the dependencies eg. Dplyr, tidyverse etc
-        run: renv::restore()
-        shell: Rscript {0}
-  
-      - name: Generate data # Run the script
-        run: source("R/job.R")
-        shell: Rscript {0}
+    # Load repo and install R
+    steps:
+    - uses: actions/checkout@master
+    - uses: r-lib/actions/setup-r@master
+      with:
+        r-version: '4.1.2'
+
+    # Set-up R
+    - name: Install packages
+      run: |
+        R -e 'install.packages("tidyverse")'
+        R -e 'install.packages("rvest")'
+    # Run R script
+    - name: Scrape
+      run: Rscript R/job.R
       
-      - name: Commit files # Commit changes
-        run: |
-          git config --local mmburu20@gmail.com "actions@github.com"
-          git config --local m-mburu "GitHub Actions"
-          git add .
-          git diff-index --quiet HEAD || (git commit -m "update data" && git push)
+ # Add new files in data folder, commit along with other modified files, push
+    - name: Commit files
+      run: |
+        git config --local m-mburu actions-user
+        git config --local mmburu20@gmail.com  "actions@github.com"
+        git add data/*
+        git commit -am "GH ACTION Headlines $(date)"
+        git push origin main
+      env:
+        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+        username: github-actions
