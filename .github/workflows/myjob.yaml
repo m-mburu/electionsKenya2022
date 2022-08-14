@@ -21,8 +21,9 @@ jobs:
     # Set-up R
     - name: Install packages
       run: |
-        R -e 'install.packages("tidyverse")'
+        R -e 'install.packages(c("tidyverse", "data.table", "XML", "remotes", "janitor"))'
         R -e 'install.packages("rvest")'
+      shell: Rscript {0}
     # Run R script
     - name: Scrape
       run: Rscript R/job.R
