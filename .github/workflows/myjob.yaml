@@ -7,36 +7,20 @@ on:
   schedule:
     - cron:  '*/5 * * * *'
 
-jobs: 
-  autoscrape:
-    # The type of runner that the job will run on
+jobs:
+  render:
+    name: Kenya Election Data update
     runs-on: ubuntu-latest
-
-    # Load repo and install R
     steps:
-    - uses: actions/checkout@master
-    - uses: r-lib/actions/setup-r@master
-      with:
-        r-version: '4.1.2'
-
-    # Set-up R
-    - name: Install packages
-      run: |
-        R -e 'install.packages(c("tidyverse", "data.table", "XML", "remotes", "janitor"))'
-        R -e 'install.packages("rvest")'
-      shell: Rscript {0}
-    # Run R script
-    - name: Scrape
-      run: Rscript R/job.R
-      
- # Add new files in data folder, commit along with other modified files, push
-    - name: Commit files
-      run: |
-        git config --local m-mburu actions-user
-        git config --local mmburu20@gmail.com  "actions@github.com"
-        git add data/*
-        git commit -am "GH ACTION Headlines $(date)"
-        git push origin main
-      env:
-        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-        username: github-actions
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install dependencies
+        run: Rscript -e 'install.packages(c("tidyverse", "data.table", "XML", "remotes", "janitor", "rmarkdown", "DT"))'
+      - name: Scrape the data
+        run: Rscript R/job.R
+      - name: Commit results
+        run: |
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}" || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
